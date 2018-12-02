@@ -3,9 +3,9 @@ from os import environ, chdir, getcwd
 from os.path import exists, isdir, join, expanduser
 from subprocess import run
 from string import ascii_letters, punctuation
-import glob
+from glob import glob
 from shlex import split
-import subprocess
+
 
 """-------------------------------PRINTENV-------------------------------"""
 
@@ -203,13 +203,40 @@ def change_arg(args, status):
         args[index] = str(status)
     return args
 
+
+def check_DB(i, user_input):
+    tam = []
+    command = [user_input[0]]
+    count_start = i.count("*")
+    count_question = i.count("?")
+    check = len(i) - 1
+    if check == (count_start + count_question):
+        if count_question < 1:
+            tam.append(i)
+            tam.append(".")
+            tam.append("..")
+        elif count_question == 1:
+            tam.append(i)
+            tam.append("..")
+        elif count_question > 1:
+            tam.append(i)
+            return tam
+    else:
+        tam.append(i)
+    for j in tam:
+        cmd = sorted(glob(j))
+        command += cmd
+    return command
+
 """----------------------------globbing----------------------------"""
 def globbing(user_input):
     cases = ['.', '?', '*', '[', '!']
     command = []
     for i in user_input:
         if any(x in i for x in cases):
-            cmd = sorted(glob.glob(i))
+            if i.startswith(".*"):
+                return check_DB(i, user_input)
+            cmd = sorted(glob(i))
             if cmd:
                 command += cmd
             else:
@@ -254,6 +281,7 @@ def main():
             break
         if user_input:
             user_input = handle_start(user_input)
+            print(user_input)
             if 'exit' == user_input[0]:
                 if handle_exit(user_input, exit_status):
                     exit(exit_status)
