@@ -248,21 +248,24 @@ def globbing(user_input):
 def add_til(root, link):
     cre_path = root
     if len(link) > 1:
-        cre_path += '/' + cre_path[1]
-    return
+        cre_path += '/' + link[1]
+    return cre_path
 
 def tilde_expansions(user_input):
     tilde_user_input = []
     for i in user_input:
         path = i.split("/",1)
-        if path[0] == "~":
-            tilde_user_input.append(add_til(environ['HOME'], path))
-        elif path[0] == "~+":
-            tilde_user_input.append(add_til(getcwd(), path))
-        elif path[0] == "~-":
-            tilde_user_input.append(add_til(environ['OLDPWD'], path))
+        if i.startswith("~"):
+            if path[0] == "~":
+                tilde_user_input.append(add_til(environ['HOME'], path))
+            elif path[0] == "~+":
+                tilde_user_input.append(add_til(getcwd(), path))
+            elif path[0] == "~-":
+                tilde_user_input.append(add_til(environ['OLDPWD'], path))
+            else:
+                tilde_user_input.append(path[0])
         else:
-            tilde_user_input.append(path[0])
+            tilde_user_input.append(i)
     return tilde_user_input
 """----------------------------tilde expansions----------------------------"""
 def handle_start(user_input):
@@ -281,7 +284,6 @@ def main():
             break
         if user_input:
             user_input = handle_start(user_input)
-            print(user_input)
             if 'exit' == user_input[0]:
                 if handle_exit(user_input, exit_status):
                     exit(exit_status)
