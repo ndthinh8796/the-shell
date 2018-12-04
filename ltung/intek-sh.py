@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 from os import environ, chdir, getcwd
 from os.path import exists, isdir, join, expanduser
-from subprocess import run
+from subprocess import run, PIPE
 from string import ascii_letters, punctuation
 from glob import glob
 from shlex import split
+import sys
 
 
 """-------------------------------PRINTENV-------------------------------"""
@@ -146,6 +147,7 @@ def search_path(file):
 
 
 def handle_input(input_list):
+    a = [">", "<", ">>", "<<", "2>", "2>>"]
     command = input_list[0]
     if 'cd' == command:
         return handle_cd(input_list)
@@ -155,10 +157,12 @@ def handle_input(input_list):
         return handle_export(input_list)
     elif 'unset' == command:
         return handle_unset(input_list)
+    elif any(i in input_list for i in a):
+        return handle_redirections(input_list)
+    elif any("|" in i for i in input_list):
+        return handle_pipes(input_list)
     elif search_path(command) or './' in command:
         return handle_external(input_list)
-    # elif search_path(command) :
-    #     return globbing(input_list)
     else:
         print('intek-sh: ' + command + ': command not found')
         return 127
@@ -268,10 +272,56 @@ def tilde_expansions(user_input):
             tilde_user_input.append(i)
     return tilde_user_input
 """----------------------------tilde expansions----------------------------"""
+
+
 def handle_start(user_input):
     user = tilde_expansions(user_input)
     user = globbing(user)
     return user
+
+
+"""----------------------------the redirections----------------------------"""
+
+
+def diff_list(lst1, lst2, delist):
+    return [i for i in lst1 if i not in lst2 and i not in delist]
+
+
+def handle_redirections(user_input):
+    redirections = [">", "<", ">>", "<<", "2>", "2>>", "|"]
+    work1 = {">" : "w", ">>" : "a"}
+    work2 = {"<" : "rb", "<<" : "rb"}
+    work3 = {"2>" : "w", "2>>" : "a"}
+    output, input, err = sys.stdout, sys.stdin, sys.stderr
+    input_handle = None
+    list_file = []
+    for i in user_input:
+        if i in redirections:
+            if i in work1:
+                sys.stdout = open(user_input[user_input.index(i)+1], work1[i])
+            elif i in work2:
+                with open(user_input[user_input.index(i)+1], work2[i]) as f:
+                    input_handle = f.read()
+            elif i in work3:
+                sys.stderr = open(user_input[user_input.index(i)+1], work3[i])
+            list_file.append(user_input[user_input.index(i)+1])
+    command = diff_list(user_input, list_file, redirections)
+    run(command, stdout = sys.stdout, input = input_handle, stderr=sys.stderr)
+    sys.stdout, sys.stdint, sys.stderr = output, input, err
+
+
+def handle_pipes(user_input):
+    vt = user_input.index("|")
+    tam = []
+    for i in range(vt + 1 , len(user_input)):
+        tam.append(user_input[i])
+    input = run(user_input[vt - 1], stdout=PIPE)
+    run(tam, stdout = sys.stdout, input = input.stdout, stderr=sys.stderr)
+
+
+
+
+
 """----------------------------MAIN----------------------------------"""
 
 
