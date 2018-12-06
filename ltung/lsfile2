@@ -1,0 +1,19 @@
+total 60
+drwxr-xr-x 2 ltung students  4096 Th12  6 15:52 .
+drwxr-xr-x 4 ltung students  4096 Th12  6 14:59 ..
+-rw-r--r-- 1 ltung students     0 Th12  6 14:59 bar.txt
+-rw-r--r-- 1 ltung students    41 Th12  6 14:59 baz.txt
+-rw-r--r-- 1 ltung students     0 Th12  6 14:59 foo.txt
+-rwxr-xr-x 1 ltung students 10175 Th12  6 15:39 intek-sh.py
+-rw-r--r-- 1 ltung students   107 Th12  6 15:52 lsfile
+-rw-r--r-- 1 ltung students     0 Th12  6 15:52 lsfile2
+-rwxr-xr-x 1 ltung students     3 Th12  6 14:59 mam
+-rwxr-xr-x 1 ltung students    10 Th12  6 14:59 mbm
+-rw-r--r-- 1 ltung students     0 Th12  6 14:59 mcm
+-rw-r--r-- 1 ltung students     0 Th12  6 14:59 quang.py
+-rw-r--r-- 1 ltung students    53 Th12  6 15:21 test1.py
+-rwxr-xr-x 1 ltung students    23 Th12  6 14:59 test.py
+-rw-r--r-- 1 ltung students    82 Th12  6 14:59 tung
+-rw-r--r-- 1 ltung students    77 Th12  6 14:59 tung.py
+-rw-r--r-- 1 ltung students    91 Th12  6 14:59 tung.txt
+-rwxr-xr-x 1 ltung students     3 Th12  6 14:59 xxx

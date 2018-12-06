@@ -132,7 +132,12 @@ def handle_cd(cpath):
             return print_cd_error(error)
 
 
-"""---------------------------COMMANDS---------------------------------"""
+"""---------------------------COMMANDS---------------------------------"""# vt = user_input.index("|")
+    # tam = []
+    # for i in range(vt + 1 , len(user_input)):
+    #     tam.append(user_input[i])
+    # input = run(user_input[vt - 1], stdout=PIPE)
+    # run(tam, stdout = sys.stdout, input = input.stdout, stderr=sys.stderr)
 
 
 # search for file in PATH
@@ -232,6 +237,27 @@ def check_DB(i, user_input):
         command += cmd
     return command
 
+
+def check_ch(i, user_input):
+    tam = []
+    command = [user_input[0]]
+    count_question = i.count("?")
+    count_start = i.count("*")
+    if count_question == 1:
+        if count_start == 0:  # khong co cham *
+                tam.append(i)
+                tam.append("..")
+        else:# khong co cham *
+                tam.append(i)
+                tam.append("..")
+                tam.append(".")
+    else:
+        tam.append(i)
+    for j in tam:
+        cmd = sorted(glob(j))
+        command += cmd
+    return command
+
 """----------------------------globbing----------------------------"""
 def globbing(user_input):
     cases = ['.', '?', '*', '[', '!']
@@ -240,6 +266,8 @@ def globbing(user_input):
         if any(x in i for x in cases):
             if i.startswith(".*"):
                 return check_DB(i, user_input)
+            if i.startswith(".?"):
+                return check_ch(i, user_input)
             cmd = sorted(glob(i))
             if cmd:
                 command += cmd
@@ -311,15 +339,21 @@ def handle_redirections(user_input):
 
 
 def handle_pipes(user_input):
-    vt = user_input.index("|")
-    tam = []
-    for i in range(vt + 1 , len(user_input)):
-        tam.append(user_input[i])
-    input = run(user_input[vt - 1], stdout=PIPE)
-    run(tam, stdout = sys.stdout, input = input.stdout, stderr=sys.stderr)
-
-
-
+    handle_input = None
+    s = []
+    c = []
+    for i in range(len(user_input)):
+        if user_input[i] != "|":
+            s.append(user_input[i])
+        else:
+            c.append(s)
+            s = []
+    c.append(s)
+    for i in range(len(c)):
+        if i == len(c) - 1:
+            run(c[i], input = handle_input)
+        chay = run(c[i], input = handle_input, stdout = PIPE)
+        handle_input = chay.stdout
 
 
 """----------------------------MAIN----------------------------------"""
