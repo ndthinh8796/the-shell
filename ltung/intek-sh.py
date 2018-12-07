@@ -303,6 +303,7 @@ def tilde_expansions(user_input):
 
 
 def handle_start(user_input):
+    print(user_input)
     user = tilde_expansions(user_input)
     user = globbing(user)
     return user
