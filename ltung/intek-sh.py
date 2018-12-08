@@ -5,6 +5,7 @@ from subprocess import run, PIPE
 from string import ascii_letters, punctuation
 from glob import glob
 from shlex import split
+from string import ascii_uppercase
 import sys
 
 
@@ -213,6 +214,35 @@ def change_arg(args, status):
     return args
 
 
+"""----------------------------ttttttttt----------------------------"""
+
+def find_vt(lst):
+    for i in lst:
+        if "-" in i:
+            a = i.index("-")
+            start = i[a - 1]
+            end = i[a + 1]
+            break
+    return start, end
+
+
+def handle(lst, cmd):
+    list_abc = []
+    kq = []
+    command = [lst[0]]
+    s, e = find_vt(lst)
+    for x in ascii_uppercase:
+        list_abc.append(x.lower())
+        list_abc.append(x)
+    for i in range(list_abc.index(s), list_abc.index(e)+1):
+        kq.append(list_abc[i])
+    n = cmd.index('[')
+    k = cmd.index(']')
+    string = cmd[:n] + str(kq) + cmd[k + 1:]
+    command += glob(string)
+    return command
+
+
 def check_DB(i, user_input):
     tam = []
     command = [user_input[0]]
@@ -264,6 +294,8 @@ def globbing(user_input):
     command = []
     for i in user_input:
         if any(x in i for x in cases):
+            if "[" in i:
+                return handle(user_input, i)
             if i.startswith(".*"):
                 return check_DB(i, user_input)
             if i.startswith(".?"):
@@ -303,7 +335,6 @@ def tilde_expansions(user_input):
 
 
 def handle_start(user_input):
-    print(user_input)
     user = tilde_expansions(user_input)
     user = globbing(user)
     return user

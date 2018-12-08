@@ -1,25 +1,24 @@
 from string import ascii_uppercase
 
-def chuoi(lst):
+def find_vt(lst):
     for i in lst:
         if "-" in i:
             a = i.index("-")
-            start = lst[a - 1]
-            end = lst[a + 1]
+            start = i[a - 1]
+            end = i[a + 1]
             break
-    print(start)
-    print(end)
-    # a = []
-    # c = []
-    # for x in ascii_uppercase:
-    #     a.append(x.lower())
-    #     a.append(x)
-    # for i in a:
-    #     if i != "D":
-    #         c.append(i)
-    #     else:
-    #         c.append(i)
-    #         break
-    # print(c)
+    return start, end
 
-chuoi(['ls', '*[a-c].py'])
+def handle(lst):
+    a = []
+    kq = []
+    s, e = find_vt(lst)
+    for x in ascii_uppercase:
+        a.append(x.lower())
+        a.append(x)
+    for i in range(a.index(s), a.index(e)+1):
+        kq.append(a[i])
+    return kq
+
+
+print(handle(['ls', '*[a-D].py']))
