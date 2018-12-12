@@ -315,12 +315,14 @@ def add_til(root, link):
         cre_path += '/' + link[1]
     return cre_path
 
+
 def tilde_expansions(user_input):
     tilde_user_input = []
+    path_user = environ["USER"]
     for i in user_input:
         path = i.split("/",1)
         if i.startswith("~"):
-            if path[0] == "~":
+            if path[0] == "~" or i.startswith("~{0}".format(path_user)):
                 tilde_user_input.append(add_til(environ['HOME'], path))
             elif path[0] == "~+":
                 tilde_user_input.append(add_til(getcwd(), path))
@@ -331,6 +333,73 @@ def tilde_expansions(user_input):
         else:
             tilde_user_input.append(i)
     return tilde_user_input
+
+
+def check_input(user_in):
+    count = 0
+    for x in user_in:
+        if '=' in x:
+            count += 1
+    if len(user_in) == count:
+        return True
+    return False
+
+
+def handle_dict(user_in, lst_dic, path_variables):
+    check = check_input(user_in)
+    if check:
+        for x in user_in:
+            key, value = x.split('=')
+            if key in path_variables:
+                environ[key] = value
+            else:
+                if value == '':
+                    del lst_dic[key]
+                else:
+                    lst_dic[key] = value
+    return lst_dic
+
+
+def handle_parameters(user_input, lst_dict):
+    conditions = [key for key in environ]
+    lst_dict = handle_dict(user_input, lst_dict, conditions)
+
+    for x in range(len(user_input)):
+        if '$' in user_input[x]:
+            index = user_input[x].index('$') + 1
+            string = user_input[x][:index - 1]
+            key = ''
+            if user_input[x][index] == '{':
+                if '}' in user_input[x]:
+                    index += 1
+                    while user_input[x][index] != '}':
+                        key += user_input[x][index]
+                        index += 1
+                try:
+                    if key not in conditions:
+                        user_input[x] = string + lst_dict[key] + user_input[x][index+1:]
+                    else:
+                        user_input[x] = string + environ[key] + user_input[x][index+1:]
+                except KeyError:
+                    if key not in conditions:
+                        user_input[x] = string + user_input[x][index+1:]
+                    else:
+                        user_input[x] = string + user_input[x][index+1:]
+            else:
+                bien = user_input[x][index:]
+                try:
+                    if bien not in conditions:
+                        user_input[x] = string + lst_dict[bien]
+                    else:
+                        user_input[x] = string + environ[bien]
+                except KeyError:
+                    if bien not in conditions:
+                        user_input[x] = string
+                    else:
+                        user_input[x] = string
+    return user_input
+
+
 """----------------------------tilde expansions----------------------------"""
 
 
@@ -393,13 +462,16 @@ def handle_pipes(user_input):
 
 def main():
     exit_status = 0
+    lst = environ.copy()
     while True:
         try:
             user_input = split(input('intek-sh$ '), posix=True)
+            print(user_input)
         except EOFError:
             break
         if user_input:
             user_input = handle_start(user_input)
+            print(handle_parameters(user_input, lst))
             if 'exit' == user_input[0]:
                 if handle_exit(user_input, exit_status):
                     exit(exit_status)
