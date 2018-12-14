@@ -366,10 +366,10 @@ def handle_parameters(user_input, lst_dict):
 
     for x in range(len(user_input)):
         if '$' in user_input[x]:
-            index = user_input[x].index('$') + 1
+            index = user_input[x].index('$') + 1  # vt dau $
             string = user_input[x][:index - 1]
             key = ''
-            if user_input[x][index] == '{':
+            if user_input[x][index] == '{':  # tim du lieu trong {}
                 if '}' in user_input[x]:
                     index += 1
                     while user_input[x][index] != '}':
@@ -381,12 +381,12 @@ def handle_parameters(user_input, lst_dict):
                     else:
                         user_input[x] = string + environ[key] + user_input[x][index+1:]
                 except KeyError:
-                    if key not in conditions:
+                    if key not in conditions:  # khong co key trong environ
                         user_input[x] = string + user_input[x][index+1:]
                     else:
                         user_input[x] = string + user_input[x][index+1:]
             else:
-                bien = user_input[x][index:]
+                bien = user_input[x][index:]  #sau dau $
                 try:
                     if bien not in conditions:
                         user_input[x] = string + lst_dict[bien]
@@ -466,12 +466,11 @@ def main():
     while True:
         try:
             user_input = split(input('intek-sh$ '), posix=True)
-            print(user_input)
         except EOFError:
             break
         if user_input:
             user_input = handle_start(user_input)
-            print(handle_parameters(user_input, lst))
+            handle_parameters(user_input, lst)
             if 'exit' == user_input[0]:
                 if handle_exit(user_input, exit_status):
                     exit(exit_status)
